@@ -1,3 +1,5 @@
+import MerminDielectric
+
 class ElectronGas:
     """
     A simple description of the uniform electron gas  (UEG) at finite
@@ -29,21 +31,99 @@ class ElectronGas:
     (in a relaxation-time approximation picture) in the presence of the ions in
     our sample.
     """
-    def __init__(self, temperature, chemicalpot, DOSratio=None):
+    def __init__(self, temperature, chemicalpot, density, DOSratio=None):
         """
         Parameters:
         ___________
-        temperature: scalar
+        temperature: float
             The thermal energy (kB*T: k - Boltzmann's constant, T is
-            temperature) of the electron gas, in atomic units (a.u.) or units of
-            1/Ha, where Ha = Hartree energy = 27.2114 eV.
-        chemicalpotential: scalar
+            temperature) of the electron gas, in atomic units (a.u.) or units
+            of Ha, where Ha = Hartree energy = 27.2114 eV.
+        chemicalpotential: float
             Chemical potential of the electron gas in a.u. (units of 1/Ha).
+        density: float
+            Electron density of the electron gas, in a.u. or units of 1/a0^3,
+            where a0 = Bohr radius = 0.529 Angstrom.
         dosratio: function, default None
             Ratio of the nonideal density of states (DOS) and the ideal DOS.
-            This is a function of the electronic momentum. In atomic units, this
-            is related to the energy by momentum = sqrt(2*energy).
+            This is a function of the electronic momentum. In atomic units,
+            this is related to the energy by momentum = sqrt(2*energy).
         """
-                 self.temp = temperature
-                 self.chempot = chemicalpot
-                 self.dosratio = DOSratio
+        self.temp = temperature
+        self.chempot = chemicalpot
+        self.density = density
+        self.dosratio = DOSratio
+
+    def dielectric(self, momentum, energy, collfreq=0):
+        """
+        Returns the dielectric function for the (free) electron gas using the
+        (RPA) Mermin approximatio, as a function of the momentum (spatial
+        frequency) and energy (temporal frequency) of the perturbation (these
+        are typically denoted by :math:`k, \omega`). In the dielectric theory,
+        which is linear, this perturbation excites the same frequencies in the
+        dielectric response.
+        
+        For the Mermin dielectric, the collfreq argument represents the
+        electron-ion collision frequency and is incorporated as a relaxation
+        parameter.
+
+        Parameters:
+        ___________
+        momentum: float
+            :math:`\hbar k`, where :math:`k` is the spatial frequency of
+            perturbation, in atomic units (a.u.) or units of 1/a0, where
+            a0 = Bohr radius = 0.529 Angstrom.
+        energy: array-like or float
+            :math:`\hbar \omega`, where :math:`\omega` is the (angular) temporal
+            frequency of the perturbation, in a.u. or units of Ha, where
+            Ha = Hartree energy = 27.2114 eV.
+        collfreq: array-like or float
+            The electron-ion collision frequency that modifies the free electron
+            approximation (which neglects electron-ion interactions). If
+            array-like, must be same length at energy. In a.u. or units of Ha.
+            Default value is 0.
+        """
+        return MerminDielectric.MerminDielectric(momentum,
+                                                 energy,
+                                                 collfreq,
+                                                 self.temp,
+                                                 self.chempot,
+                                                 self.dosratio)
+    
+    def electronloss(self, momentum, energy, collfreq=0):
+        """
+        Returns the electron loss function for the (free) electron gas using the
+        (RPA) Mermin approximatio, as a function of the momentum (spatial
+        frequency) and energy (temporal frequency) of the perturbation (these
+        are typically denoted by :math:`k, \omega`).
+        
+        For the Mermin dielectric, the collfreq argument represents the
+        electron-ion collision frequency and is incorporated as a relaxation
+        parameter.
+
+        Parameters:
+        ___________
+        momentum: float
+            :math:`\hbar k`, where :math:`k` is the spatial frequency of
+            perturbation, in atomic units (a.u.) or units of 1/a0, where
+            a0 = Bohr radius = 0.529 Angstrom.
+        energy: array-like or float
+            :math:`\hbar \omega`, where :math:`\omega` is the (angular) temporal
+            frequency of the perturbation, in a.u. or units of Ha, where
+            Ha = Hartree energy = 27.2114 eV.
+        collfreq: array-like or float
+            The electron-ion collision frequency that modifies the free electron
+            approximation (which neglects electron-ion interactions). If
+            array-like, must be same length at energy. In a.u. or units of Ha.
+            Default value is 0.
+        """
+        return MerminDielectric.ELF(momentum,
+                                    energy,
+                                    collfreq,
+                                    self.temp,
+                                    self.chempot,
+                                    self.dosratio)
+    
+    def stoppingpower(self, velocity, charge):
+        return 0
+

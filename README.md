@@ -1,9 +1,9 @@
-# electrongas
-A simple description of the uniform electron gas  (UEG) at finite
-temperatures.
+# electrondielectric
+A simple description of the uniform electron gas (UEG) at finite temperatures
+using the dielectric formalism.
 
-This code follows the dielectric formalism for describing the UEG, and from
-there calculates two related quantities:
+The main feature of this code is the calculation of the dielectric function
+for the UEG. In addition, two other related quantities can also be calculated:
 1. The dynamic structure factor : structurefactor()
    This quantity is closely related to the intensity of scattered photons
    from a material. By comparing the results from this model to experimental
@@ -21,9 +21,8 @@ there calculates two related quantities:
     gas.
 
 To compute the dielectric function, we rely on two main approximations. The
-first is the random phase approximation (RPA),
-the second builds upon
-the RPA by incorporating a dynamic electron-ion collision frequency. The
-collision frequency describes how the electron density-response is modified
+first is the random phase approximation (RPA) (_cite_). The second builds upon
+the RPA by incorporating a dynamic electron-ion collision frequency (_cite_).
+The collision frequency describes how the electron density-response is modified
 (in a relaxation-time approximation picture) in the presence of the ions in
 our sample.

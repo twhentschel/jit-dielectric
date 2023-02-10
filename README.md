@@ -1,9 +1,43 @@
-# electrondielectric
-A simple description of the uniform electron gas (UEG) at finite temperatures
+# electron-dielectric
+A simple description of an electron gas at finite temperatures
 using the dielectric formalism.
 
 The main feature of this code is the calculation of the dielectric function
-for the UEG. In addition, two other related quantities can also be calculated:
+for an electron gas.
+
+The dielectric function describe how a material responds to some external
+electromagnetic perturbation or force. This is a function of the material
+properties (like temperature and density) and also of the frequency modes of the
+perturbing force. The spatial frequency is denoted by k, and is also the
+momentum transferred to the material. The temporal frequency is denoted by
+omega, and is also the energy transferred to the material. Here, we assume that
+the material is isotropic so that we only care about the magnitude of the
+spatial frequency. 
+
+The dielectric function also describes the screening of ions by electrons in
+the system, resulting in a shielding of the original charge of the ions. This
+process creates 'qausi-particle' like objects (a positively charged
+particle surrounded by negatively charged electrons) that weak interaction due
+to a reduced and modified Coulomb force.
+
+To compute the dielectric function, we rely on two main approximations:
+
+The random phase approximation is a specific approach to computing the screening
+effect of electrons in a material. For simplicity, we assume the electrons form
+an electron gas (that is, we ignore the prescense of the ions in our material,
+replacing them with a positive background charge to ensure charge neutrality of
+the system).
+
+The Mermin dielectric function builds upon the random phase approximation (RPA)
+dielectric function by including an electron-ion collision frequency term
+(denoted as nu in the code) that can also be omega dependent. The collision
+frequency aims to improve the assumption of that electrons are electron gas by
+approximating how the electronic response is modified (in a relaxation-
+time approximation picture) in the presence of the ions in our sample. 
+
+
+In addition, we also provide functions to compute two quantities that are related
+to the dielectric function:
 1. The dynamic structure factor : structurefactor()
    This quantity is closely related to the intensity of scattered photons
    from a material. By comparing the results from this model to experimental
@@ -19,10 +53,3 @@ for the UEG. In addition, two other related quantities can also be calculated:
     target material. This model returns the electronic stopping power,
     assuming that the electrons behave primarily like a uniform electron
     gas.
-
-To compute the dielectric function, we rely on two main approximations. The
-first is the random phase approximation (RPA) (_cite_). The second builds upon
-the RPA by incorporating a dynamic electron-ion collision frequency (_cite_).
-The collision frequency describes how the electron density-response is modified
-(in a relaxation-time approximation picture) in the presence of the ions in
-our sample.

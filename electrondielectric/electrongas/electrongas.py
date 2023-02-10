@@ -112,17 +112,26 @@ class ElectronGas:
         
         Parameters:
         ___________
-        q: float or array-like
+        q: array_like of real values
             The spatial frequency of the perturbation acting on the electron
             gas. Units are a.u. or units of 1/a0, where
             a0 = Bohr radius = 0.529 Angstrom.
-        omega: float or array-like
+        omega: array_like of real values
             Temporal frequency of the perturbation acting on the electron
             gas. Units are a.u. or units of Ha, where
             Ha = Hartree energy = 27.2114 eV.
-        collfreq: float or array-like, optional
+        collfreq: array_like of real values
             The collision frequency (inverse of the collision rate) between the
-            electrons and ions. If array-like, must be same size as omega.
+            electrons and ions. If 1D array, must be same size as omega.
+            
+        Returns:
+        ________
+        ret: ndarray of complex values
+            If q and omega are both 1D arrays, shape will be
+            (size(q), size(omega)). Otherwise, if only one of these arguments is
+            a 1D array of size n and the other is a scalar, the shape is
+            (size(n),). If both arguments are scalars, the result is a complex
+            scalar as well.
         """
         if collfreq is None:
             collfreq = 0.

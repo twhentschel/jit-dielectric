@@ -3,6 +3,7 @@
 import warnings
 import fdint
 import numpy as np
+from electrondielectric.dielectric.dielectric import MerminDielectric
 
 class ElectronGas:
     """
@@ -17,11 +18,11 @@ class ElectronGas:
     density: float
         Electron density of the electron gas, in a.u. or units of 1/a0^3,
         where a0 = Bohr radius = 0.529 Angstrom.
-    DOSratio: function, default None
+    DOSratio: function, optional
         Ratio of the nonideal density of states (DOS) and the ideal DOS.
         This is a function of the electronic momentum. In atomic units,
         this is related to the energy by momentum = sqrt(2*energy).
-    chemicalpot: float, default None
+    chemicalpot: float, optional
         The chemical potential of the electron gas in a.u.
         
     Notes
@@ -43,22 +44,97 @@ class ElectronGas:
         chemicalpot = None
     ):
 
-        self.temp = temperature
-        self.density = density
-        self.dosratio = DOSratio
+        self._temp = temperature
+        self._density = density
+        self._dosratio = DOSratio
     
         
         if chemicalpot is None:
-            if DOSratio is not None:
+            if self._dosratio is not None:
                 warnings.warn("DOSratio is given but not chemicalpot. "\
                     + "Will use the chemical potential computed using the "\
                     + "ideal DOS.")
             # compute chemical potential using ideal DOS
-            self.chempot = fdint.ifd1h(2 * np.pi**2 * self.density \
-                                       / (2*self.temp)**(3/2)) * self.temp
+            self._chempot = fdint.ifd1h(2 * np.pi**2 * self._density \
+                                        / (2*self._temp)**(3/2)) * self._temp
         else:
-            self.chempot = chemicalpot
+            self._chempot = chemicalpot
+    
+    @property
+    def temperature(self):
+        """
+        The temperature (thermal energy) of the electron gas, in atomic units.
+        """
+        return self._temp
+    
+    @property
+    def density(self):
+        """
+        The density of the electron gas, in atomic units.
+        """
+        return self._density
+    
+    @property
+    def chempot(self):
+        """
+        The chemical potential of the electron gas, in atomic units.
+        """
+        return self._chempot
+
+    @property
+    def dosratio(self):
+        """
+        Ratio of the nonideal density of states (DOS) and the ideal DOS.
+        This is a function of the electronic momentum. In atomic units,
+        this is related to the energy by momentum = sqrt(2*energy).
+        """
+        return self._dosratio
+    
+    def dielectric(self, q, omega, collfreq=None):
+        """
+        The dielectric function of the electron gas as a function of the spatial
+        (q) and temporal (omega) frequency modes excited by a perturbation. If
+        the electron-ion collision frequency (collfreq) is not supplied, this
+        returns the random phase approximation (RPA) dielectric function. If a
+        collision frequency is used, this returns the Mermin dielectric
+        function.
+        
+        The uniform electron gas is a theoretical creation that does not exist
+        in nature, although there are some metals (like aluminum, for example)
+        whose electrons almost behave like an free/ideal electron gas. The goal
+        of including a collision frequency parameter is to improve the electron
+        gas description to better predict the behavior of true materials that
+        have ions present. As such, the collision frequency is a material-
+        dependent quantity. It can also be (temporal) frequency dependent (that
+        is, dependent on omega).
+        
+        All parameters are in atomic units (a.u.).
+        
+        Parameters:
+        ___________
+        q: float or array-like
+            The spatial frequency of the perturbation acting on the electron
+            gas. Units are a.u. or units of 1/a0, where
+            a0 = Bohr radius = 0.529 Angstrom.
+        omega: float or array-like
+            Temporal frequency of the perturbation acting on the electron
+            gas. Units are a.u. or units of Ha, where
+            Ha = Hartree energy = 27.2114 eV.
+        collfreq: float or array-like, optional
+            The collision frequency (inverse of the collision rate) between the
+            electrons and ions. If array-like, must be same size as omega.
+        """
+        if collfreq is None:
+            collfreq = 0.
             
+        return MerminDielectric(
+            q,
+            omega,
+            collfreq,
+            self.temperature(),
+            self.chempot(),
+            self.dosratio()
+        )
 
     # def dielectric(self, momentum, energy, collfreq=0):
     #     """

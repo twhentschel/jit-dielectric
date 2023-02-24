@@ -3,21 +3,43 @@ Created on Thu Nov 21 14:22:36 2019
 
 @author: tommy
 
-Numerically calculates the Mermin dielectric function.
+Functions to numerically calculates the Mermin dielectric function.
 
 The dielectric function describe how a material responds to some external
-external perturbation or force. This is a function of the material properties
-and also of the frequency of the perturbing force. The spatial frequency is
-denoted by k, and is also the momentum transferred to the material. The temporal
-frequency is denoted by omega, and is also the energy transferred to the
-material. Here, we assume that the material is isotropic so that we only care
-about the magnitude of the spatial frequency.
+electromagnetic perturbation or force. This is a function of the material
+properties (like temperature and density) and also of the frequency modes of the
+perturbing force. The spatial frequency is denoted by k, and is also the
+momentum transferred to the material. The temporal frequency is denoted by
+omega, and is also the energy transferred to the material. Here, we assume that
+the material is isotropic so that we only care about the magnitude of the
+spatial frequency. 
+
+The dielectric function also describes the screening of ions by electrons in
+the system, resulting in a shielding of the original charge of the ions. This
+process creates 'qausi-particle' like objects (a positively charged
+particle surrounded by negatively charged electrons) that weak interaction due
+to a reduced and modified Coulomb force.
+
+The random phase approximation is a specific approach to computing the screening
+effect of electrons in a material. For simplicity, we assume the electrons form
+an electron gas (that is, we ignore the prescense of the ions in our material,
+replacing them with a positive background charge to ensure charge neutrality of
+the system).
+
+The Mermin dielectric function builds upon the random phase approximation (RPA)
+dielectric function by including an electron-ion collision frequency term
+(denoted as nu in the code) that can also be omega dependent. The collision
+frequency aims to improve the assumption of that electrons are electron gas by
+approximating how the electronic response is modified (in a relaxation-
+time approximation picture) in the presence of the ions in our sample. 
 
 This code follows the work by David Perkins, Andre Souza, Didier Saumon,
 and Charles Starrett as produced in the 2013 Final Reports from the Los
 Alamos National Laboratory Computational Physics Student Summer Workshop,
 in the section titled "Modeling X-Ray Thomson Scattering Spectra
 of Warm Dense Matter".
+
+All quantities are in atomic units (a.u.)
 """
 
 
@@ -30,28 +52,31 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
 
     Parameters:
     ___________
-    p: float
+    p: array_like of real values
         The integration variable, which is also the momemtum of the electronic
         state.
-    k: float
-        The momentum, or spatial frequency, excited by the external
-        perturbation, in a.u. (units of 1/a0, a0 = Bohr radius = 0.529
-        angstroms)
-    omega: float
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    kBT: float
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    kBT: real
         Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
-    mu: float
+    mu: real
         Chemical potential in a.u.
-    nu: float
-        Collision frequency in a.u.
-    dosratio: float
-        Ratio of nonideal density of states (DOS) and the ideal DOS. Often this
-        will be a function of p.
+    dosratio: function, optional
+        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
+        implies that the ideal density of states is correct, so dosratio(x) = 1
+        for any x >= 0.
+
     Returns:
-        : float
     ________
+        : array_like of real values
     """
 
     # delta will help with avoiding singularities if the real part of nu is 0.
@@ -94,29 +119,34 @@ def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
 
     Parameters:
     ___________
-    u: float
+    u: array_like of real values
         The integration variable, which is transformation of the the momemtum of
         the electronic state.
-    k: float
-        The change of momentum for an incident photon with momentum k0
-        scattering to a state with momentum k1: k = |k1-k0|, in a.u.
-    omega: float
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    kBT: float
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    kBT: real
         Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
-    mu: float
+    mu: real
         Chemical potential in a.u.
-    nu: float
-        Collision frequency in a.u.
     plim: list-like of length 2
         Original limits of integration. The limits after the transformation
         will be from (-\infty, +\infty)
-    dosratio: function
-        Ratio of the nonideal density of states (DOS) and the ideal DOS.
+    dosratio: function, optional
+        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
+        implies that the ideal density of states is correct, so dosratio(x) = 1
+        for any x >= 0.
+
     Returns:
     ________
-        : float
+        : array_like of real values
     """
 
     a, b = plim
@@ -134,30 +164,28 @@ def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     The integrand present in the formula for the imaginary part of the general
     RPA dielectric function.
 
-    Parameters:
-    ___________
-    p: float
-        The integration variable, which is also the momemtum of the electronic
-        state.
-    k: float
-        The change of momentum for an incident photon with momentum k0
-        scattering to a state with momentum k1: k = |k1-k0|, in a.u.
-    omega: float
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    kBT: float
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    kBT: real
         Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
-    mu: float
+    mu: real
         Chemical potential in a.u.
-    nu: float
-        Collision frequency in a.u.
-    dosratio: float
-        Ratio of nonideal density of states (DOS) and the ideal DOS. Often this
-        will be a function of p.
+    dosratio: function, optional
+        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
+        implies that the ideal density of states is correct, so dosratio(x) = 1
+        for any x >= 0.
 
     Returns:
     ________
-        : float
+        : array_like of real values
     """
 
     # variables to avoid verbose lines later on.
@@ -184,27 +212,32 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
 
     Parameters:
     ___________
-    k: float
-        The change of momentum for an incident photon with momentum k0
-        scattering to a state with momentum k1: k = |k1-k0|, in a.u.
-    omega: float or array-like
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    nu: float or array-like
-        Collision frequency in a.u. If array-like, must has same size as omega.
-    kBT: float
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    kBT: real
         Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
-    mu: float
+    mu: real
         Chemical potential in a.u.
-    dosratio: function, default None
+    dosratio: function, optional
         Ratio of the nonideal density of states (DOS) and the ideal DOS. None
         implies that the ideal density of states is correct, so dosratio(x) = 1
         for any x >= 0.
 
     Returns:
     ________
-    ret: float or array-like
-        If array-like, size will be size(k) * size(omega).
+    ret: ndarray of complex values
+        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
+        Otherwise, if only one of these arguments is a 1D array of size n and
+        the other is a scalar, the shape is (size(n),). If both arguments are
+        scalars, the result is a complex scalar as well.
     """
 
     # To handle both scalar and array inputs
@@ -306,21 +339,27 @@ def generalMermin(epsilon, k, omega, nu, *args):
         dielectric function that we want to add ionic information to. The
         argument structure must be epsilon(k, omega, nu, args) and args must
         be ordered properly.
-    k: float
-        The change of momentum for an incident photon with momentum k0
-        scattering to a state with momentum k1: k = |k1-k0|, in a.u.
-    omega: float
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    nu: float
-        Collision frequency in a.u.
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
     args: tuple
         Additional arguments (temperature, chemical potential, ...). Must be
         same order as in the epsilon() function.
 
     Returns:
-    _______
-        : float
+    ________
+    ret: ndarray of complex values
+        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
+        Otherwise, if only one of these arguments is a 1D array of size n and
+        the other is a scalar, the shape is (size(n),). If both arguments are
+        scalars, the result is a complex scalar as well.
     """
     N = len(omega)
     
@@ -343,31 +382,32 @@ def MerminDielectric(k, omega, nu, kBT, mu, dosratio=None):
 
     Parameters:
     ___________
-    k: float
-        The change of momentum for an incident photon with momentum k0
-        scattering to a state with momentum k1: k = |k1-k0|, in a.u.
-    omega: float
-        The change of energy for an incident photon with energy w0
-        scattering to a state with energy w1: w = w0-w1, in a.u.
-    kBT: float
+    k: array_like of real values
+        The spatial frequency of the perturbation acting on the material.
+        Units are a.u. or units of 1/a0, where
+        a0 = Bohr radius = 0.529 Angstrom.
+    omega: array_like of real values
+        Temporal frequency of the perturbation acting on the electron
+        gas. Units are a.u. or units of Ha, where
+        Ha = Hartree energy = 27.2114 eV.
+    nu: array_like of real values
+        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    kBT: real
         Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
-    mu: float
+    mu: real
         Chemical potential in a.u.
-    nu: float
-        Collision frequency in a.u.
+    dosratio: function, optional
+        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
+        implies that the ideal density of states is correct, so dosratio(x) = 1
+        for any x >= 0.
 
     Returns:
     ________
-        : float
+    ret: ndarray of complex values
+        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
+        Otherwise, if only one of these arguments is a 1D array of size n and
+        the other is a scalar, the shape is (size(n),). If both arguments are
+        scalars, the result is a complex scalar as well.
     """
 
     return generalMermin(generalRPAdielectric, k, omega, nu, kBT, mu, dosratio)
-
-def ELF(k, omega, nu, kBT, mu, dosratio=None):
-    """
-    Electron Loss Function, related to the amount of energy dissapated in the
-    system.
-    """
-
-    eps = MerminDielectric(k, omega, nu, kBT, mu, dosratio)
-    return eps.imag/(eps.real**2 + eps.imag**2)

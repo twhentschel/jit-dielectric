@@ -3,7 +3,6 @@
 import warnings
 import fdint
 import numpy as np
-from electrondielectric.dielectric.dielectric import MerminDielectric
 
 
 class ElectronGas:

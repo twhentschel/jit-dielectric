@@ -89,9 +89,9 @@ class Mermin(AbstractDielectric):
             q,
             omega,
             self._collfreq(omega),
-            self._electrongas.temperature(),
-            self._electrongas.chempot(),
-            self._electrongas.dosratio()
+            self._electrongas.temperature,
+            self._electrongas.chempot,
+            self._electrongas.dosratio
         )
 
         return ret

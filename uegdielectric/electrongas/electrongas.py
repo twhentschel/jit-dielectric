@@ -1,8 +1,11 @@
 """ A class to represent the electron gas."""
 
 import warnings
-import fdint
 import numpy as np
+
+from uegdielectric.electrongas._inv_fermi_integral import (
+    inv_fdint_onehalf as ifdint
+)
 
 
 class ElectronGas:
@@ -12,7 +15,7 @@ class ElectronGas:
     Parameters
     ___________
     temperature: float
-        The thermal energy (kB*T: kB - Boltzmann's constant, T is
+        The thermal energy (kB*T: kB - Boltzmann constant, T is
         temperature) of the electron gas, in atomic units (a.u.) or units
         of Ha, where Ha = Hartree energy = 27.2114 eV.
     density: float
@@ -51,12 +54,10 @@ class ElectronGas:
 
         if chemicalpot is None:
             if self._dosratio is not None:
-                warnings.warn("DOSratio is given but not chemicalpot. "
-                              + "Will use the chemical potential computed using the "
-                              + "ideal DOS.")
+                warnmssg = "DOSratio is given but not chemicalpot. Will use the chemical potential computed using the ideal DOS."
+                warnings.warn(warnmssg)
             # compute chemical potential using ideal DOS
-            self._chempot = fdint.ifd1h(2 * np.pi**2 * self._density
-                                        / (2*self._temp)**(3/2)) * self._temp
+            self._chempot = ifdint(self._density, self._temp)
         else:
             self._chempot = chemicalpot
 

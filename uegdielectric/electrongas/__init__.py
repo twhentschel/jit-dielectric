@@ -1,1 +1,1 @@
-from electrondielectric.electrongas.electrongas_class import ElectronGas
+from uegdielectric.electrongas.electrongas import ElectronGas

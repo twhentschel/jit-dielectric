@@ -41,6 +41,7 @@ All quantities are in atomic units (a.u.)
 
 import numpy as np
 
+
 def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     """
     The integrand present in the formula for the real part of the general
@@ -62,7 +63,7 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     nu: array_like of real values
         Collision frequency in a.u. If a 1D array, must has same size as omega.
     kBT: real
-        Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
         Chemical potential in a.u.
     dosratio: function, optional
@@ -129,7 +130,7 @@ def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
     nu: array_like of real values
         Collision frequency in a.u. If a 1D array, must has same size as omega.
     kBT: real
-        Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
         Chemical potential in a.u.
     plim: list-like of length 2
@@ -171,7 +172,7 @@ def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     nu: array_like of real values
         Collision frequency in a.u. If a 1D array, must has same size as omega.
     kBT: real
-        Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
         Chemical potential in a.u.
     dosratio: function, optional
@@ -219,7 +220,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     nu: array_like of real values
         Collision frequency in a.u. If a 1D array, must has same size as omega.
     kBT: real
-        Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
         Chemical potential in a.u.
     dosratio: function, optional
@@ -357,7 +358,9 @@ def generalMermin(epsilon, k, omega, nu, *args):
         the other is a scalar, the shape is (size(n),). If both arguments are
         scalars, the result is a complex scalar as well.
     """
-    N = len(omega)
+
+    omega = np.asarray(omega)
+    N = omega.size
     
     epsnonzerofreq = epsilon(k, omega, nu, *args)
     epszerofreq    = epsilon(k, np.zeros(N), np.zeros(N), *args)
@@ -389,7 +392,7 @@ def MerminDielectric(k, omega, nu, kBT, mu, dosratio=None):
     nu: array_like of real values
         Collision frequency in a.u. If a 1D array, must has same size as omega.
     kBT: real
-        Thermal energy (kb - Boltzmann's constant, T is temperature) in a.u.
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
         Chemical potential in a.u.
     dosratio: function, optional

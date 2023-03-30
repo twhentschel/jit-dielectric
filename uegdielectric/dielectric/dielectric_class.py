@@ -10,7 +10,7 @@ class AbstractDielectric(ABC):
     function."""
 
     @abstractmethod
-    def dielectric(self, q, omega):
+    def __call__(self, q, omega):
         """Compute the dielectric function"""
         pass
 
@@ -42,10 +42,11 @@ class Mermin(AbstractDielectric):
         else:
             self._collfreq = collfreq
 
-    def dielectric(
+    def __call__(
             self,
             q,
-            omega):
+            omega
+    ):
         """
         The dielectric function of the electron gas as a function of the wave
         number (q) and frequency (omega) modes excited by a perturbation
@@ -135,5 +136,5 @@ class RPA(Mermin):
     def __init__(self, argument):
         super().__init__(argument)
 
-    def dielectric(self, q, omega):
-        return super().dielectric(q, omega)
+    def __call__(self, q, omega):
+        return super().__call__(q, omega)

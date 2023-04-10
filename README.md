@@ -25,14 +25,14 @@ electrons = ElectronGas(t, d)
 We can use either the `RPA` or `Mermin` classes to compute the complex dielectric function as a function of wave number `q` and frequency `omega`. For the `Mermin` model, we also need to provide an electron-ion collision rate `nu`, which can be frequency dependent.
 
 ```
-from uegdielectric import RPA
-dielectric = RPA(electrons)
+from uegdielectric import dielectric
+eps = dielectric.RPA(electrons)
 # wave number
 q = 1.0 # atomic units
 # frequency
 omega = 0.5 # atomic units
 # dielectric object is callable!
-dielectric(q, omega)
+eps(q, omega)
 >>> (1.452804827343392+0.8463619935408268j)
 ```
 More examples are being added to the `docs/notebooks` directory.
@@ -60,7 +60,7 @@ def cd(newdir):
         os.chdir(prevdir)
 
 with cd("path/to/ueg-dielectric directory"):
-    from uegdielectric import Mermin, RPA, ElectronGas
+    from uegdielectric import dielectric, ElectronGas
 ```
 where you should replace `"path/to/ueg-dielectric directory"` by the appropriate path on your file system.
 

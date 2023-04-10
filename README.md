@@ -1,4 +1,9 @@
 # UEG dielectric
+
+
+[![DOI](https://zenodo.org/badge/591088318.svg)](https://zenodo.org/badge/latestdoi/591088318)
+
+
 Numerical methods to compute the finite-temperature random phase approximation and Mermin dielectric functions of a uniform electron gas (UEG).
 
 # Introduction

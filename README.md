@@ -17,7 +17,7 @@ This module computes the complex, quantum mechanical dielectric function for a u
 > Note: all quantities are in atomic units[^1]
 
 We use `ElectronGas` class objects to hold the physical information about the electrons (e.g. temperature/thermal energy, electron density)
-```
+```python
 from uegdielectric import ElectronGas
 
 # thermal energy of electrons
@@ -29,7 +29,7 @@ electrons = ElectronGas(t, d)
 
 We can use either the `RPA` or `Mermin` classes to compute the complex dielectric function as a function of wave number `q` and frequency `omega`. For the `Mermin` model, we also need to provide an electron-ion collision rate `nu`, which can be frequency dependent.
 
-```
+```python
 from uegdielectric import dielectric
 eps = dielectric.RPA(electrons)
 # wave number
@@ -51,7 +51,7 @@ To run jupyter notebooks in `docs/notebooks`, will also need
 # Installation
 Currently, installation is done by cloning this repository from GitHub. To import this project in Python, it needs to be added to your PYTHONPATH.
 Personally, I like to import this directory into my jupyter notebooks by doing:
-```
+```python
 import os
 from contextlib import contextmanager
 

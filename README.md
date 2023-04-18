@@ -71,4 +71,4 @@ where you should replace `"path/to/ueg-dielectric directory"` by the appropriate
 
 In the future, this project should be installable via `pip`.
 
-[^1]: A guide on converting between atomic units and SI units is a work in progress.
+[^1]: See [this Wikipedia article](https://en.wikipedia.org/wiki/Hartree_atomic_units) for an introduction to atomic units.

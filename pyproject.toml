@@ -3,6 +3,10 @@
 test = [
     "pytest>=7.3.1",
 ]
+lint = [
+    "flake8>=6.0.0",
+    "black>=23.3.0",
+]
 
 [project]
 name = "ueg-dielectric"

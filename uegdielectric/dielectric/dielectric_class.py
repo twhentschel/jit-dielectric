@@ -29,11 +29,7 @@ class Mermin(AbstractDielectric):
         of the pertubation. If it is a function, it must have only one argument that is of type float and be defined for all nonegative numbers.
     """
 
-    def __init__(
-        self,
-        electrongas,
-        collfreq=None
-    ):
+    def __init__(self, electrongas, collfreq=None):
         self._electrongas = electrongas
         if collfreq is None:
             self._collfreq = lambda x: 0
@@ -42,11 +38,7 @@ class Mermin(AbstractDielectric):
         else:
             self._collfreq = collfreq
 
-    def __call__(
-            self,
-            q,
-            omega
-    ):
+    def __call__(self, q, omega):
         """
         The dielectric function of the electron gas as a function of the wave
         number (q) and frequency (omega) modes excited by a perturbation
@@ -92,7 +84,7 @@ class Mermin(AbstractDielectric):
             self._collfreq(omega),
             self._electrongas.temperature,
             self._electrongas.chempot,
-            self._electrongas.dosratio
+            self._electrongas.dosratio,
         )
 
         return ret

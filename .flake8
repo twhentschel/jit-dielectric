@@ -1,0 +1,18 @@
+[flake8]
+max-line-length = 88
+extend-ignore =
+    # D205 1 blank line required between summary line and description in docstring
+    D205,
+    # D302 is unnecessary as we are using Python 3.6+.: Deprecated: Use u""" for Unicode docstrings
+    D302,
+    # D400 first line should end with a period in docstring
+    D400,
+    # D403: First word of the first line should be properly capitalized ('Latex', not 'LaTeX')
+    D403,
+    # E203 whitespace before ':'
+    E203,
+    # E731 do not assign a lambda, use a def
+    E731,
+    # W605 invalid escape sequence, frequently used in defining math expressions in comments
+    W605,
+exclude = .jupyter

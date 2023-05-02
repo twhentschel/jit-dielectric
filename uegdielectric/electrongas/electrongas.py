@@ -1,11 +1,8 @@
 """ A class to represent the electron gas."""
 
 import warnings
-import numpy as np
 
-from uegdielectric.electrongas._inv_fermi_integral import (
-    inv_fdint_onehalf as ifdint
-)
+from uegdielectric.electrongas._inv_fermi_integral import inv_fdint_onehalf as ifdint
 
 
 class ElectronGas:
@@ -40,21 +37,17 @@ class ElectronGas:
     argument and the chemical potential that is computed from the density.
     """
 
-    def __init__(
-        self,
-        temperature,
-        density,
-        DOSratio=None,
-        chemicalpot=None
-    ):
-
+    def __init__(self, temperature, density, DOSratio=None, chemicalpot=None):
         self._temp = temperature
         self._density = density
         self._dosratio = DOSratio
 
         if chemicalpot is None:
             if self._dosratio is not None:
-                warnmssg = "DOSratio is given but not chemicalpot. Will use the chemical potential computed using the ideal DOS."
+                warnmssg = (
+                    "DOSratio is given but not chemicalpot. Will use the "
+                    + "chemical potential computed using the ideal DOS."
+                )
                 warnings.warn(warnmssg)
             # compute chemical potential using ideal DOS
             self._chempot = ifdint(self._density, self._temp)

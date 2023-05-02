@@ -79,18 +79,26 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     # delta will help with avoiding singularities if the real part of nu is 0.
     deltamod = 1e-5
 
-
     # variables to avoid verbose lines later on.
-    pp = (k**2 + 2*(omega-nu.imag) + 2*p*k)**2 + (2*nu.real + deltamod)**2
-    pm = (k**2 + 2*(omega-nu.imag) - 2*p*k)**2 + (2*nu.real + deltamod)**2
-    mp = (k**2 - 2*(omega-nu.imag) + 2*p*k)**2 + (2*nu.real + deltamod)**2
-    mm = (k**2 - 2*(omega-nu.imag) - 2*p*k)**2 + (2*nu.real + deltamod)**2
+    pp = (k**2 + 2 * (omega - nu.imag) + 2 * p * k) ** 2 + (
+        2 * nu.real + deltamod
+    ) ** 2
+    pm = (k**2 + 2 * (omega - nu.imag) - 2 * p * k) ** 2 + (
+        2 * nu.real + deltamod
+    ) ** 2
+    mp = (k**2 - 2 * (omega - nu.imag) + 2 * p * k) ** 2 + (
+        2 * nu.real + deltamod
+    ) ** 2
+    mm = (k**2 - 2 * (omega - nu.imag) - 2 * p * k) ** 2 + (
+        2 * nu.real + deltamod
+    ) ** 2
 
-    logpart = np.log(np.sqrt(pp/pm)) + np.log(np.sqrt(mp/mm))
+    logpart = np.log(np.sqrt(pp / pm)) + np.log(np.sqrt(mp / mm))
 
-    FD = 1/(1+np.exp((p**2/2 - mu)/kBT))
+    FD = 1 / (1 + np.exp((p**2 / 2 - mu) / kBT))
 
     return logpart * FD * p * dosratio
+
 
 def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
     """
@@ -148,12 +156,13 @@ def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
 
     a, b = plim
 
-    ptrans = ((b-a) * np.tanh(np.pi/2*np.sinh(u)) + (b+a))/2
+    ptrans = ((b - a) * np.tanh(np.pi / 2 * np.sinh(u)) + (b + a)) / 2
 
-    transfactor = (b-a)/2 * np.pi/2 * np.cosh(u)/np.cosh(np.pi/2*np.sinh(u))**2
+    transfactor = (
+        (b - a) / 2 * np.pi / 2 * np.cosh(u) / np.cosh(np.pi / 2 * np.sinh(u)) ** 2
+    )
 
-    return transfactor * realintegrand(ptrans, k, omega, nu, kBT, mu,
-                                       dosratio(ptrans))
+    return transfactor * realintegrand(ptrans, k, omega, nu, kBT, mu, dosratio(ptrans))
 
 
 def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
@@ -186,17 +195,22 @@ def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     """
 
     # variables to avoid verbose lines later on.
-    pp = k**2 + 2*(omega-nu.imag) + 2*p*k
-    pm = k**2 + 2*(omega-nu.imag) - 2*p*k
-    mp = k**2 - 2*(omega-nu.imag) + 2*p*k
-    mm = k**2 - 2*(omega-nu.imag) - 2*p*k
+    pp = k**2 + 2 * (omega - nu.imag) + 2 * p * k
+    pm = k**2 + 2 * (omega - nu.imag) - 2 * p * k
+    mp = k**2 - 2 * (omega - nu.imag) + 2 * p * k
+    mm = k**2 - 2 * (omega - nu.imag) - 2 * p * k
 
-    arctanpart = np.arctan2(2.*nu.real, pp) - np.arctan2(2.*nu.real, pm) \
-               + np.arctan2(-2.*nu.real, mp) - np.arctan2(-2.*nu.real, mm)
+    arctanpart = (
+        np.arctan2(2.0 * nu.real, pp)
+        - np.arctan2(2.0 * nu.real, pm)
+        + np.arctan2(-2.0 * nu.real, mp)
+        - np.arctan2(-2.0 * nu.real, mm)
+    )
 
-    FD = 1/(1+np.exp((p**2/2 - mu)/kBT))
+    FD = 1 / (1 + np.exp((p**2 / 2 - mu) / kBT))
 
     return arctanpart * FD * p * dosratio
+
 
 def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     """
@@ -243,7 +257,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     nu = np.asarray(nu)
     scalar_input = False
     if k.ndim == 0:
-        k = np.expand_dims(k, axis=0) # Makes k 1D
+        k = np.expand_dims(k, axis=0)  # Makes k 1D
         scalar_input = True
     if omega.ndim == 0:
         omega = np.expand_dims(omega, axis=0)
@@ -254,13 +268,13 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     # Lengths of array inputs
     M = k.size
     N = omega.size
-    
+
     # Meshgrid for broadcasting k, omega
-    k, omega = np.meshgrid(k, omega, indexing='ij', sparse=True)
+    k, omega = np.meshgrid(k, omega, indexing="ij", sparse=True)
 
     if dosratio is None:
         # Make dosratio the constant function returning 1
-        dosratio = lambda x : 1
+        dosratio = lambda x: 1
 
     # A small nu causes some problems when integrating the real and imaginary
     # parts of the dielectric.
@@ -270,28 +284,28 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     # small delta term in the integrand).
     # (p3 essentially defines the point at which the Fermi-Dirac exponential,
     # 1 / (1 + np.exp((p^2/2 - mu)/kBT), starts to drop off considerably.)
-    p1 = abs(k**2-2*omega)/(2*k)
-    p2 = (k**2 + 2*omega)/(2*k)
-    p3 = np.sqrt(abs(2*mu))
+    p1 = abs(k**2 - 2 * omega) / (2 * k)
+    p2 = (k**2 + 2 * omega) / (2 * k)
+    p3 = np.sqrt(abs(2 * mu))
 
     ### Integral for real part of the dielectric function ###
 
     # Transformed integrand for real part
-    realint = lambda x, lims : DEtransform(x, k, omega, nu, kBT, mu, lims,
-                                           dosratio)
+    realint = lambda x, lims: DEtransform(x, k, omega, nu, kBT, mu, lims, dosratio)
 
     # All transformed integrations fall roughly within the same region in the
     # transformed space
-    t = np.linspace(-2.5*np.ones((M, N)), 2.5*np.ones((M, N)), 200, axis=0)
-    tempwidth = np.sqrt(2*np.abs(mu + 10*kBT))
-    realsolve =   np.trapz(realint(t, (np.zeros(N) , p1)), t, axis=0) \
-                + np.trapz(realint(t, (p1, p2)), t, axis=0) \
-                + np.trapz(realint(t, (p2, 2*p2 + tempwidth)), t, axis=0)
-
+    t = np.linspace(-2.5 * np.ones((M, N)), 2.5 * np.ones((M, N)), 200, axis=0)
+    tempwidth = np.sqrt(2 * np.abs(mu + 10 * kBT))
+    realsolve = (
+        np.trapz(realint(t, (np.zeros(N), p1)), t, axis=0)
+        + np.trapz(realint(t, (p1, p2)), t, axis=0)
+        + np.trapz(realint(t, (p2, 2 * p2 + tempwidth)), t, axis=0)
+    )
 
     ### Integral for the imag part of the dielectric function ###
 
-    imagint = lambda x : imagintegrand(x, k, omega, nu, kBT, mu, dosratio(x))
+    imagint = lambda x: imagintegrand(x, k, omega, nu, kBT, mu, dosratio(x))
 
     # Explicitly identify difficult points in integration range, plus the
     # "widths" around each point (1e-4 gently smoothes peaks when nu.real == 0)
@@ -322,6 +336,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     if scalar_input:
         return np.squeeze(ret)
     return ret
+
 
 def generalMermin(epsilon, k, omega, nu, *args):
     """
@@ -361,18 +376,18 @@ def generalMermin(epsilon, k, omega, nu, *args):
 
     omega = np.asarray(omega)
     N = omega.size
-    
+
     epsnonzerofreq = epsilon(k, omega, nu, *args)
-    epszerofreq    = epsilon(k, np.zeros(N), np.zeros(N), *args)
+    epszerofreq = epsilon(k, np.zeros(N), np.zeros(N), *args)
 
     # If nu is zero, we expect to get back epsnonzerofreq. But if omega also
     # equals zero, this code fails. Add a little delta to omega to avoid this.
     delta = 1e-10
-    numerator   = ((omega + delta) + 1j*nu)*(epsnonzerofreq - 1)
-    denominator = (omega+delta) \
-                  + 1j*nu * (epsnonzerofreq - 1)/(epszerofreq - 1)
+    numerator = ((omega + delta) + 1j * nu) * (epsnonzerofreq - 1)
+    denominator = (omega + delta) + 1j * nu * (epsnonzerofreq - 1) / (epszerofreq - 1)
 
-    return 1 + numerator/denominator
+    return 1 + numerator / denominator
+
 
 def MerminDielectric(k, omega, nu, kBT, mu, dosratio=None):
     """

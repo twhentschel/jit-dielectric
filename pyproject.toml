@@ -1,4 +1,12 @@
 [tool.pdm]
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=7.3.1",
+]
+lint = [
+    "flake8>=6.0.0",
+    "black>=23.3.0",
+]
 
 [project]
 name = "ueg-dielectric"
@@ -9,14 +17,12 @@ authors = [
 ]
 dependencies = [
     "numpy>=1.24.2",
+    "ipykernel>=6.22.0",
+    "matplotlib>=3.7.1",
 ]
 requires-python = ">=3.9"
 readme = "README.md"
 license = {text = "MIT"}
-[project.optional-dependencies]
-matplotlib = [
-    "matplotlib>=3.7.1",
-]
 
 [build-system]
 requires = ["pdm-backend"]

@@ -472,7 +472,7 @@ summary = "Backport of pathlib-compatible object wrapper for zip files"
 
 [metadata]
 lock_version = "4.2"
-groups = ["default", "lint", "matplotlib", "mpmath", "test"]
+groups = ["default", "lint", "test"]
 content_hash = "sha256:99567f07111a6525a9bfbea546422de6af405cb8b5dd8caa831ae94da3b600d1"
 
 [metadata.files]

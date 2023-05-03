@@ -8,7 +8,10 @@ Helper functions to numerically calculates the Mermin dielectric function.
 The dielectric function describe how a material responds to some external
 electromagnetic perturbation or force. This is a function of the material
 properties (like temperature and density) and also of the frequency modes of the
-perturbing force. The wave number or spatial frequency is denoted by k, and is also the momentum transferred to the material. The temporal frequency is denoted by omega, and is also the energy transferred to the material. Here, we assume that the material is isotropic so that we only care about the magnitude of the wave number. 
+perturbing force. The wave number or spatial frequency is denoted by k, and is also the
+momentum transferred to the material. The temporal frequency is denoted by omega, and
+is also the energy transferred to the material. Here, we assume that the material is
+isotropic so that we only care about the magnitude of the wave number.
 
 The dielectric function also describes the screening of ions by electrons in
 the system, resulting in a shielding of the original charge of the ions. This
@@ -27,7 +30,7 @@ dielectric function by including an electron-ion collision frequency term
 (denoted as nu in the code) that can also be omega dependent. The collision
 frequency aims to improve the assumption of that electrons are electron gas by
 approximating how the electronic response is modified (in a relaxation-
-time approximation picture) in the presence of the ions in our sample. 
+time approximation picture) in the presence of the ions in our sample.
 
 This code follows the work by David Perkins, Andre Souza, Didier Saumon,
 and Charles Starrett as produced in the 2013 Final Reports from the Los
@@ -288,7 +291,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     p2 = (k**2 + 2 * omega) / (2 * k)
     p3 = np.sqrt(abs(2 * mu))
 
-    ### Integral for real part of the dielectric function ###
+    # Integral for real part of the dielectric function #
 
     # Transformed integrand for real part
     realint = lambda x, lims: DEtransform(x, k, omega, nu, kBT, mu, lims, dosratio)
@@ -303,7 +306,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
         + np.trapz(realint(t, (p2, 2 * p2 + tempwidth)), t, axis=0)
     )
 
-    ### Integral for the imag part of the dielectric function ###
+    # Integral for the imag part of the dielectric function #
 
     imagint = lambda x: imagintegrand(x, k, omega, nu, kBT, mu, dosratio(x))
 

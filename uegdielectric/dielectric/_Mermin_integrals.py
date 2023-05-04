@@ -43,6 +43,7 @@ All quantities are in atomic units (a.u.)
 
 
 import numpy as np
+from numba import jit_module
 
 
 def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
@@ -428,3 +429,6 @@ def MerminDielectric(k, omega, nu, kBT, mu, dosratio=None):
     """
 
     return generalMermin(generalRPAdielectric, k, omega, nu, kBT, mu, dosratio)
+
+
+jit_module(nopython=True, error_model="numpy")

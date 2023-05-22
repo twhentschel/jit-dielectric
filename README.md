@@ -14,7 +14,8 @@ This module computes the complex, quantum mechanical dielectric function for a u
 2. The __Mermin ansatz__ (Mermin, [1970](https://link.aps.org/doi/10.1103/PhysRevB.1.2362)), which modifies the electron gas dielectric function to more accurately represent electrons in the real material by incorporating an electron-ion collision rate.
 
 # Getting Started
-> Note: all quantities are in atomic units[^1]
+> **Note**:
+> all quantities are in atomic units[^1]
 
 We use `ElectronGas` class objects to hold the physical information about the electrons (e.g. temperature/thermal energy, electron density)
 ```python

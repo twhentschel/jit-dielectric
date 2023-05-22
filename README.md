@@ -43,32 +43,13 @@ eps(q, omega)
 More examples are being added to the `docs/notebooks` directory.
 
 # Requirements
-* numpy
-
-To run jupyter notebooks in `docs/notebooks`, will also need
-* matplotlib
+UEG dielectric supports Python >= 3.9.
 
 # Installation
-Currently, installation is done by cloning this repository from GitHub. To import this project in Python, it needs to be added to your PYTHONPATH.
-Personally, I like to import this directory into my jupyter notebooks by doing:
-```python
-import os
-from contextlib import contextmanager
-
-@contextmanager
-def cd(newdir):
-    prevdir = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
-    try:
-        yield
-    finally:
-        os.chdir(prevdir)
-
-with cd("path/to/ueg-dielectric directory"):
-    from uegdielectric import dielectric, ElectronGas
+Install the latest GitHub `main` version using `pip`:
 ```
-where you should replace `"path/to/ueg-dielectric directory"` by the appropriate path on your file system.
+pip install git+https://github.com/twhentschel/ueg-dielectric.git
+```
 
-In the future, this project should be installable via `pip`.
 
 [^1]: See [this Wikipedia article](https://en.wikipedia.org/wiki/Hartree_atomic_units) for an introduction to atomic units.

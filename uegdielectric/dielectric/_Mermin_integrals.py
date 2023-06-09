@@ -1,6 +1,4 @@
 """
-Created on Thu Nov 21 14:22:36 2019
-
 @author: tommy
 
 Helper functions to numerically calculates the Mermin dielectric function.
@@ -104,7 +102,7 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
 
 
 def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
-    """
+    r"""
     Transform the real integral using a Double Exponential (DE) change of
     variables.
 

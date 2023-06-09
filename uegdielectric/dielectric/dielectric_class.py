@@ -26,7 +26,8 @@ class Mermin(AbstractDielectric):
     collfreq : float or function, optional
         Electron-ion collision frequency, which depends on the material we
         are modelling as an electron gas. Can be a function of the frequency
-        of the pertubation. If it is a function, it must have only one argument that is of type float and be defined for all nonegative numbers.
+        of the pertubation. If it is a function, it must have only one argument that is
+        of type float and be defined for all nonegative numbers.
     """
 
     def __init__(self, electrongas, collfreq=None):
@@ -119,8 +120,12 @@ class RPA(Mermin):
 
     Notes:
     ______
-     In the collective limit (for example, for small wavenumbers), it can be helpful to damp the RPA response with a small collision frequency to avoid numerical issues. How small is up to you (the larger the value, the less RPA-like the calculation), but a good first attempt is
-     0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV. The following example shows how this can be done.
+     In the collective limit (for example, for small wavenumbers), it can be helpful to
+     dampen the RPA response with a small collision frequency to avoid numerical
+     issues. How small is up to you (the larger the value, the less RPA-like the
+     calculation), but a good first attempt is
+     0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV. The following
+     example shows how this can be done.
 
      >>> RPA.collfreq(1/27.2114)
     """

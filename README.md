@@ -1,10 +1,8 @@
 # UEG dielectric
 
 
-[![DOI](https://zenodo.org/badge/591088318.svg)](https://zenodo.org/badge/latestdoi/591088318)
 
-
-Numerical methods to compute the finite-temperature random phase approximation and Mermin dielectric functions of a uniform electron gas (UEG).
+A forked/imported version of ueg-dielectric - numerical methods to compute the finite-temperature random phase approximation and Mermin dielectric functions of a uniform electron gas (UEG) _with JIT compilation_.
 
 # Introduction
 The dielectric function is a wave vector and frequency dependent generalization of the macroscopic dielectric constant $\epsilon$ used in theory of linear dielectric media that relates the electric displacement field $\mathbf{D}$ and the electric field $\mathbf{E}$: $\mathbf{D} = \epsilon \mathbf{E}$. It ultimately describes how the electrons in a material respond to some external electromagnetic perturbation or force. The dielectric function is important because it is related to many observable quantities in the linear response regime, like the dynamic structure factor (which is measured in scattering experiments) and the stopping power (which is important in inertial confinement fusion experiments). 

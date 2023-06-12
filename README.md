@@ -47,7 +47,7 @@ UEG dielectric supports Python ≥ 3.9.
 # Installation
 Install the latest GitHub `main` version using `pip`:
 ```
-pip install git+https://github.com/twhentschel/ueg-dielectric.git
+pip install git+https://github.com/twhentschel/jit-dielectric.git
 ```
 
 

@@ -1,4 +1,4 @@
-# UEG dielectric
+# JIT (UEG) dielectric
 
 
 

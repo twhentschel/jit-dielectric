@@ -1,10 +1,8 @@
-# UEG dielectric
+# JIT (UEG) dielectric
 
 
-[![DOI](https://zenodo.org/badge/591088318.svg)](https://zenodo.org/badge/latestdoi/591088318)
 
-
-Numerical methods to compute the finite-temperature random phase approximation and Mermin dielectric functions of a uniform electron gas (UEG).
+A forked/imported version of ueg-dielectric - numerical methods to compute the finite-temperature random phase approximation and Mermin dielectric functions of a uniform electron gas (UEG) _with JIT compilation_.
 
 # Introduction
 The dielectric function is a wave vector and frequency dependent generalization of the macroscopic dielectric constant $\epsilon$ used in theory of linear dielectric media that relates the electric displacement field $\mathbf{D}$ and the electric field $\mathbf{E}$: $\mathbf{D} = \epsilon \mathbf{E}$. It ultimately describes how the electrons in a material respond to some external electromagnetic perturbation or force. The dielectric function is important because it is related to many observable quantities in the linear response regime, like the dynamic structure factor (which is measured in scattering experiments) and the stopping power (which is important in inertial confinement fusion experiments). 
@@ -14,7 +12,8 @@ This module computes the complex, quantum mechanical dielectric function for a u
 2. The __Mermin ansatz__ (Mermin, [1970](https://link.aps.org/doi/10.1103/PhysRevB.1.2362)), which modifies the electron gas dielectric function to more accurately represent electrons in the real material by incorporating an electron-ion collision rate.
 
 # Getting Started
-> Note: all quantities are in atomic units[^1]
+> **Note**:
+> all quantities are in atomic units[^1]
 
 We use `ElectronGas` class objects to hold the physical information about the electrons (e.g. temperature/thermal energy, electron density)
 ```python
@@ -43,32 +42,13 @@ eps(q, omega)
 More examples are being added to the `docs/notebooks` directory.
 
 # Requirements
-* numpy
-
-To run jupyter notebooks in `docs/notebooks`, will also need
-* matplotlib
+UEG dielectric supports Python ≥ 3.9.
 
 # Installation
-Currently, installation is done by cloning this repository from GitHub. To import this project in Python, it needs to be added to your PYTHONPATH.
-Personally, I like to import this directory into my jupyter notebooks by doing:
-```python
-import os
-from contextlib import contextmanager
-
-@contextmanager
-def cd(newdir):
-    prevdir = os.getcwd()
-    os.chdir(os.path.expanduser(newdir))
-    try:
-        yield
-    finally:
-        os.chdir(prevdir)
-
-with cd("path/to/ueg-dielectric directory"):
-    from uegdielectric import dielectric, ElectronGas
+Install the latest GitHub `main` version using `pip`:
 ```
-where you should replace `"path/to/ueg-dielectric directory"` by the appropriate path on your file system.
+pip install git+https://github.com/twhentschel/jit-dielectric.git
+```
 
-In the future, this project should be installable via `pip`.
 
 [^1]: See [this Wikipedia article](https://en.wikipedia.org/wiki/Hartree_atomic_units) for an introduction to atomic units.

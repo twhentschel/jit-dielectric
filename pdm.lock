@@ -147,7 +147,7 @@ summary = "brain-dead simple config-ini parsing"
 
 [[package]]
 name = "ipykernel"
-version = "6.22.0"
+version = "6.23.1"
 requires_python = ">=3.8"
 summary = "IPython Kernel for Jupyter"
 dependencies = [
@@ -722,9 +722,9 @@ content_hash = "sha256:bc44e7a1625940ac5c72d3da91a87a9b09ffed80ea3d1c8e4aeeb5855
     {url = "https://files.pythonhosted.org/packages/d7/4b/cbd8e699e64a6f16ca3a8220661b5f83792b3017d0f79807cb8708d33913/iniconfig-2.0.0.tar.gz", hash = "sha256:2d91e135bf72d31a410b17c16da610a82cb55f6b0477d1a902134b24a455b8b3"},
     {url = "https://files.pythonhosted.org/packages/ef/a6/62565a6e1cf69e10f5727360368e451d4b7f58beeac6173dc9db836a5b46/iniconfig-2.0.0-py3-none-any.whl", hash = "sha256:b6a85871a79d2e3b22d2d1b94ac2824226a63c6b741c88f7ae975f18b6778374"},
 ]
-"ipykernel 6.22.0" = [
-    {url = "https://files.pythonhosted.org/packages/48/1b/260b3e4d2f633c1c9019e25a977a9e82341d0713ad8fb60e01b97b7559a4/ipykernel-6.22.0-py3-none-any.whl", hash = "sha256:1ae6047c1277508933078163721bbb479c3e7292778a04b4bacf0874550977d6"},
-    {url = "https://files.pythonhosted.org/packages/bc/18/a773c8f970269988c56678c7b8739b106c5557e419864481c90949db3754/ipykernel-6.22.0.tar.gz", hash = "sha256:302558b81f1bc22dc259fb2a0c5c7cf2f4c0bdb21b50484348f7bafe7fb71421"},
+"ipykernel 6.23.1" = [
+    {url = "https://files.pythonhosted.org/packages/15/43/d2ebd2657b77cb1e2526a4b444a494298dae1c870a27e85805039e1e3e8a/ipykernel-6.23.1.tar.gz", hash = "sha256:1aba0ae8453e15e9bc6b24e497ef6840114afcdb832ae597f32137fa19d42a6f"},
+    {url = "https://files.pythonhosted.org/packages/5d/4b/ffb537e392e730c9a5b02758f9c87077d9087bcb0d957853e13f121e5ea7/ipykernel-6.23.1-py3-none-any.whl", hash = "sha256:77aeffab056c21d16f1edccdc9e5ccbf7d96eb401bd6703610a21be8b068aadc"},
 ]
 "ipython 8.13.2" = [
     {url = "https://files.pythonhosted.org/packages/d5/16/2161195dd2f617933f8ada5bc567eb47ddbb7c99dc16ffa3e729dd25a1a0/ipython-8.13.2-py3-none-any.whl", hash = "sha256:ffca270240fbd21b06b2974e14a86494d6d29290184e788275f55e0b55914926"},

@@ -8,7 +8,7 @@ from uegdielectric.electrongas._inv_fermi_integral import inv_fdint_onehalf
 class Test_inv_fdint_onehalf:
     @classmethod
     def setup_class(cls):
-        """
+        r"""
         Initialize parameters for tests.
 
         Testing the degenerate (:math:`\eta >> 1`) (where
@@ -30,8 +30,8 @@ class Test_inv_fdint_onehalf:
         cls.den = [0.0267962, 0.00129713, 0.0203079]
 
     def test_known1(self):
-        """
-        Test inv_fdint_onehalf for a known value with :math:`eta >> 1`
+        r"""
+        Test inv_fdint_onehalf for a known value with :math:`\eta >> 1`
         """
         methodval = inv_fdint_onehalf(self.den[0], self.temp[0])
         testTrue = np.isclose(methodval, self.chempot[0], rtol=0.0, atol=1e-4)
@@ -42,8 +42,8 @@ class Test_inv_fdint_onehalf:
         assert testTrue, errStr
 
     def test_known2(self):
-        """
-        Test inv_fdint_onehalf for a known value with :math:`eta \approx 1`
+        r"""
+        Test inv_fdint_onehalf for a known value with :math:`\eta \approx 1`
         """
         methodval = inv_fdint_onehalf(self.den[1], self.temp[1])
         testTrue = np.isclose(methodval, self.chempot[1], rtol=0.0, atol=1e-4)
@@ -54,8 +54,8 @@ class Test_inv_fdint_onehalf:
         assert testTrue, errStr
 
     def test_known3(self):
-        """
-        Test inv_fdint_onehalf for a known value with :math:`eta << 1`
+        r"""
+        Test inv_fdint_onehalf for a known value with :math:`\eta << 1`
         """
         methodval = inv_fdint_onehalf(self.den[2], self.temp[2])
         testTrue = np.isclose(methodval, self.chempot[2], rtol=0.0, atol=1e-4)

@@ -4,7 +4,7 @@ import numpy as np
 
 
 def inv_fdint_onehalf(density, temp):
-    """
+    r"""
     Calculates the chemical potential (:math:`\mu`) given the electron density
     and thermal energy by inverting the complete Fermi-Dirac integral of order
     1/2.

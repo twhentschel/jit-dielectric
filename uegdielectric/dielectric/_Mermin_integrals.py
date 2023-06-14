@@ -43,9 +43,10 @@ All quantities are in atomic units (a.u.)
 
 
 import numpy as np
+import jax.numpy as jnp
 
 
-def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
+def realintegrand(p, k, omega, nu, kBT, mu):
     """
     The integrand present in the formula for the real part of the general
     RPA dielectric function.
@@ -78,7 +79,7 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     ________
         : array_like of real values
     """
-
+    dosratio = 1
     # delta will help with avoiding singularities if the real part of nu is 0.
     deltamod = 1e-5
 
@@ -96,14 +97,14 @@ def realintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
         2 * nu.real + deltamod
     ) ** 2
 
-    logpart = np.log(np.sqrt(pp / pm)) + np.log(np.sqrt(mp / mm))
+    logpart = jnp.log(jnp.sqrt(pp / pm)) + jnp.log(jnp.sqrt(mp / mm))
 
-    FD = 1 / (1 + np.exp((p**2 / 2 - mu) / kBT))
+    FD = 1 / (1 + jnp.exp((p**2 / 2 - mu) / kBT))
 
     return logpart * FD * p * dosratio
 
 
-def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
+def DEtransform(u, k, omega, nu, kBT, mu, plim):
     """
     Transform the real integral using a Double Exponential (DE) change of
     variables.
@@ -159,16 +160,16 @@ def DEtransform(u, k, omega, nu, kBT, mu, plim, dosratio):
 
     a, b = plim
 
-    ptrans = ((b - a) * np.tanh(np.pi / 2 * np.sinh(u)) + (b + a)) / 2
+    ptrans = ((b - a) * jnp.tanh(np.pi / 2 * jnp.sinh(u)) + (b + a)) / 2
 
     transfactor = (
-        (b - a) / 2 * np.pi / 2 * np.cosh(u) / np.cosh(np.pi / 2 * np.sinh(u)) ** 2
+        (b - a) / 2 * np.pi / 2 * jnp.cosh(u) / jnp.cosh(np.pi / 2 * jnp.sinh(u)) ** 2
     )
 
-    return transfactor * realintegrand(ptrans, k, omega, nu, kBT, mu, dosratio(ptrans))
+    return transfactor * realintegrand(ptrans, k, omega, nu, kBT, mu)
 
 
-def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
+def imagintegrand(p, k, omega, nu, kBT, mu):
     """
     The integrand present in the formula for the imaginary part of the general
     RPA dielectric function.
@@ -196,7 +197,7 @@ def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     ________
         : array_like of real values
     """
-
+    dosratio = 1
     # variables to avoid verbose lines later on.
     pp = k**2 + 2 * (omega - nu.imag) + 2 * p * k
     pm = k**2 + 2 * (omega - nu.imag) - 2 * p * k
@@ -204,18 +205,18 @@ def imagintegrand(p, k, omega, nu, kBT, mu, dosratio=1):
     mm = k**2 - 2 * (omega - nu.imag) - 2 * p * k
 
     arctanpart = (
-        np.arctan2(2.0 * nu.real, pp)
-        - np.arctan2(2.0 * nu.real, pm)
-        + np.arctan2(-2.0 * nu.real, mp)
-        - np.arctan2(-2.0 * nu.real, mm)
+        jnp.arctan2(2.0 * nu.real, pp)
+        - jnp.arctan2(2.0 * nu.real, pm)
+        + jnp.arctan2(-2.0 * nu.real, mp)
+        - jnp.arctan2(-2.0 * nu.real, mm)
     )
 
-    FD = 1 / (1 + np.exp((p**2 / 2 - mu) / kBT))
+    FD = 1 / (1 + jnp.exp((p**2 / 2 - mu) / kBT))
 
     return arctanpart * FD * p * dosratio
 
 
-def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
+def generalRPAdielectric(k, omega, nu, kBT, mu):
     """
     Numerically calculates the dielectric function  in Random Phase
     Approximation (RPA), epsilon_{RPA}(k, omega + i*nu). This function is
@@ -226,16 +227,16 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
 
     Parameters:
     ___________
-    k: array_like of real values
+    k: real
         The spatial frequency of the perturbation acting on the material.
         Units are a.u. or units of 1/a0, where
         a0 = Bohr radius = 0.529 Angstrom.
-    omega: array_like of real values
+    omega: real
         Temporal frequency of the perturbation acting on the electron
         gas. Units are a.u. or units of Ha, where
         Ha = Hartree energy = 27.2114 eV.
-    nu: array_like of real values
-        Collision frequency in a.u. If a 1D array, must has same size as omega.
+    nu: real
+        Collision frequency in a.u.
     kBT: real
         Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
     mu: real
@@ -247,37 +248,9 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
 
     Returns:
     ________
-    ret: ndarray of complex values
-        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
-        Otherwise, if only one of these arguments is a 1D array of size n and
-        the other is a scalar, the shape is (size(n),). If both arguments are
-        scalars, the result is a complex scalar as well.
+    ret: complex
+        General RPA dielectric function evaluated at (k, omega).
     """
-
-    # To handle both scalar and array inputs
-    k = np.asarray(k)
-    omega = np.asarray(omega)
-    nu = np.asarray(nu)
-    scalar_input = False
-    if k.ndim == 0:
-        k = np.expand_dims(k, axis=0)  # Makes k 1D
-        scalar_input = True
-    if omega.ndim == 0:
-        omega = np.expand_dims(omega, axis=0)
-        scalar_input = True
-    if nu.ndim == 0:
-        nu = np.expand_dims(nu, axis=0)
-        scalar_input = True
-    # Lengths of array inputs
-    M = k.size
-    N = omega.size
-
-    # Meshgrid for broadcasting k, omega
-    k, omega = np.meshgrid(k, omega, indexing="ij", sparse=True)
-
-    if dosratio is None:
-        # Make dosratio the constant function returning 1
-        dosratio = lambda x: 1
 
     # A small nu causes some problems when integrating the real and imaginary
     # parts of the dielectric.
@@ -287,101 +260,103 @@ def generalRPAdielectric(k, omega, nu, kBT, mu, dosratio=None):
     # small delta term in the integrand).
     # (p3 essentially defines the point at which the Fermi-Dirac exponential,
     # 1 / (1 + np.exp((p^2/2 - mu)/kBT), starts to drop off considerably.)
-    p1 = abs(k**2 - 2 * omega) / (2 * k)
+    p1 = jnp.abs(k**2 - 2 * omega) / (2 * k)
     p2 = (k**2 + 2 * omega) / (2 * k)
     p3 = np.sqrt(abs(2 * mu))
 
     # Integral for real part of the dielectric function #
 
-    # Transformed integrand for real part
-    realint = lambda x, lims: DEtransform(x, k, omega, nu, kBT, mu, lims, dosratio)
-
     # All transformed integrations fall roughly within the same region in the
     # transformed space
-    t = np.linspace(-2.5 * np.ones((M, N)), 2.5 * np.ones((M, N)), 200, axis=0)
+    t = np.linspace(-2.5, 2.5, 200)
     tempwidth = np.sqrt(2 * np.abs(mu + 10 * kBT))
     realsolve = (
-        np.trapz(realint(t, (np.zeros(N), p1)), t, axis=0)
-        + np.trapz(realint(t, (p1, p2)), t, axis=0)
-        + np.trapz(realint(t, (p2, 2 * p2 + tempwidth)), t, axis=0)
+        jnp.trapz(DEtransform(t, k, omega, nu, kBT, mu, (0, p1)), t)
+        + jnp.trapz(DEtransform(t, k, omega, nu, kBT, mu, (p1, p2)), t)
+        + jnp.trapz(DEtransform(t, k, omega, nu, kBT, mu, (p2, 2 * p2 + tempwidth)), t)
     )
 
     # Integral for the imag part of the dielectric function #
-
-    imagint = lambda x: imagintegrand(x, k, omega, nu, kBT, mu, dosratio(x))
 
     # Explicitly identify difficult points in integration range, plus the
     # "widths" around each point (1e-4 gently smoothes peaks when nu.real == 0)
     nuwidth = nu.real + 1e-4
     # Put these into an array
-    pdiff = np.zeros((8, M, N))
-    pdiff[1] = np.maximum(p1 - nuwidth, np.zeros((M, N)))
-    pdiff[2] = p1 + nuwidth
-    pdiff[3] = np.maximum(p2 - nuwidth, np.zeros((M, N)))
-    pdiff[4] = p2 + nuwidth
-    pdiff[5] = np.maximum(p3 - tempwidth, np.zeros((M, N)))
-    pdiff[6] = p3 + tempwidth
-    pdiff[7] = p2 + nuwidth + tempwidth
+    pdiff = jnp.array(
+        [
+            0,
+            jnp.maximum(p1 - nuwidth, 0),
+            p1 + nuwidth,
+            jnp.maximum(p2 - nuwidth, 0),
+            p2 + nuwidth,
+            jnp.maximum(p3 - tempwidth, 0),
+            p3 + tempwidth,
+            p2 + nuwidth + tempwidth,
+        ]
+    )
     # Sort the difficult points, so they are in order
-    pdiff = np.sort(pdiff, axis=0)
+    pdiff = jnp.sort(pdiff)
     # Linearly interpolate between the difficult point +/- their widths to
     # create a set of integration regions bounded by these points (+/- widths)
-    intregions = np.linspace(pdiff[0:7], pdiff[1:8], 100, axis=0)
+    intregions = jnp.linspace(pdiff[0:7], pdiff[1:8], 100)
     # Integrate within each of the regions
-    imagintegrateregions = np.trapz(imagint(intregions), intregions, axis=0)
-    # Add up the integrations between each region, resulting in an array of
-    # shape (M,N)
-    imagsolve = np.sum(imagintegrateregions, axis=0)
+    imagintegrateregions = jnp.trapz(
+        imagintegrand(intregions, k, omega, nu, kBT, mu), intregions
+    )
+    # Add up the integrations between each region
+    imagsolve = jnp.sum(imagintegrateregions)
+
+    # # Linearly interpolate between the difficult point +/- their widths to
+    # # create a set of integration regions bounded by these points (+/- widths)
+    # imagsolve = 0
+    # for j in range(len(pdiff) - 1):
+    #     intregion = np.linsspace(pdiff[j], pdiff[j + 1], 100)
+
+    #     # Integrate within each of the regions
+    #     imagsolve += jnp.trapz(
+    #         imagintegrand(intregion, k, omega, nu, kBT, mu), intregion
+    #     )
 
     ret = 1j * 2 / np.pi / k**3 * imagsolve
     ret += 1 + 2 / np.pi / k**3 * realsolve
 
-    if scalar_input:
-        return np.squeeze(ret)
     return ret
 
 
-def generalMermin(epsilon, k, omega, nu, *args):
+def MerminDielectric(k, omega, nu, kBT, mu):
     """
-    Numerically calculates the Mermin dielectric function. This adds some ionic
-    structure to the dielectric function passed through epsilon. Typically this
-    will be the RPA dielectric function, but we also want to allow for a
-    general dielectric functions.
+    Numerically calculates the Mermin dielectric, which builds upon the RPA
+    dielectric function by taking into account electron collisions with ions.
 
     Parameters:
     ___________
-    epsilon: function
-        dielectric function that we want to add ionic information to. The
-        argument structure must be epsilon(k, omega, nu, args) and args must
-        be ordered properly.
-    k: array_like of real values
+    k: real
         The spatial frequency of the perturbation acting on the material.
         Units are a.u. or units of 1/a0, where
         a0 = Bohr radius = 0.529 Angstrom.
-    omega: array_like of real values
+    omega: real
         Temporal frequency of the perturbation acting on the electron
         gas. Units are a.u. or units of Ha, where
         Ha = Hartree energy = 27.2114 eV.
-    nu: array_like of real values
-        Collision frequency in a.u. If a 1D array, must has same size as omega.
-    args: tuple
-        Additional arguments (temperature, chemical potential, ...). Must be
-        same order as in the epsilon() function.
+    nu: real
+        Collision frequency in a.u.
+    kBT: real
+        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
+    mu: real
+        Chemical potential in a.u.
+    dosratio: function
+        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
+        implies that the ideal density of states is correct, so dosratio(x) = 1
+        for any x >= 0.
 
     Returns:
     ________
-    ret: ndarray of complex values
-        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
-        Otherwise, if only one of these arguments is a 1D array of size n and
-        the other is a scalar, the shape is (size(n),). If both arguments are
-        scalars, the result is a complex scalar as well.
+    ret: complex
+        Mermin dielectric function evaluated at (k, omega).
     """
 
-    omega = np.asarray(omega)
-    N = omega.size
-
-    epsnonzerofreq = epsilon(k, omega, nu, *args)
-    epszerofreq = epsilon(k, np.zeros(N), np.zeros(N), *args)
+    epsnonzerofreq = generalRPAdielectric(k, omega, nu, kBT, mu)
+    epszerofreq = generalRPAdielectric(k, 0, 0, kBT, mu)
 
     # If nu is zero, we expect to get back epsnonzerofreq. But if omega also
     # equals zero, this code fails. Add a little delta to omega to avoid this.
@@ -390,41 +365,3 @@ def generalMermin(epsilon, k, omega, nu, *args):
     denominator = (omega + delta) + 1j * nu * (epsnonzerofreq - 1) / (epszerofreq - 1)
 
     return 1 + numerator / denominator
-
-
-def MerminDielectric(k, omega, nu, kBT, mu, dosratio=None):
-    """
-    Numerically calculates the Mermin dielectric, which builds upon the RPA
-    dielectric function by taking into account electron collisions with ions.
-
-    Parameters:
-    ___________
-    k: array_like of real values
-        The spatial frequency of the perturbation acting on the material.
-        Units are a.u. or units of 1/a0, where
-        a0 = Bohr radius = 0.529 Angstrom.
-    omega: array_like of real values
-        Temporal frequency of the perturbation acting on the electron
-        gas. Units are a.u. or units of Ha, where
-        Ha = Hartree energy = 27.2114 eV.
-    nu: array_like of real values
-        Collision frequency in a.u. If a 1D array, must has same size as omega.
-    kBT: real
-        Thermal energy (kb - Boltzmann constant, T is temperature) in a.u.
-    mu: real
-        Chemical potential in a.u.
-    dosratio: function, optional
-        Ratio of the nonideal density of states (DOS) and the ideal DOS. None
-        implies that the ideal density of states is correct, so dosratio(x) = 1
-        for any x >= 0.
-
-    Returns:
-    ________
-    ret: ndarray of complex values
-        If k and omega are both 1D arrays, shape will be (size(k), size(omega)).
-        Otherwise, if only one of these arguments is a 1D array of size n and
-        the other is a scalar, the shape is (size(n),). If both arguments are
-        scalars, the result is a complex scalar as well.
-    """
-
-    return generalMermin(generalRPAdielectric, k, omega, nu, kBT, mu, dosratio)

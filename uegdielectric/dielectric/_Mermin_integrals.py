@@ -42,6 +42,10 @@ All quantities are in atomic units (a.u.)
 
 import numpy as np
 import jax.numpy as jnp
+from jax import config
+
+# default to 64-bit floats
+config.update("jax_enable_x64", True)
 
 
 def realintegrand(p, k, omega, nu, kBT, mu):
@@ -299,7 +303,7 @@ def generalRPAdielectric(k, omega, nu, kBT, mu):
     intregions = jnp.linspace(pdiff[0:7], pdiff[1:8], 100)
     # Integrate within each of the regions
     imagintegrateregions = jnp.trapz(
-        imagintegrand(intregions, k, omega, nu, kBT, mu), intregions
+        imagintegrand(intregions, k, omega, nu, kBT, mu), intregions, axis=0
     )
     # Add up the integrations between each region
     imagsolve = jnp.sum(imagintegrateregions)

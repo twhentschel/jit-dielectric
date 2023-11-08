@@ -34,7 +34,7 @@ class Mermin(AbstractDielectric):
         self._electrongas = electrongas
         if collfreq is None:
             self._collfreq = lambda x: 0
-        elif isinstance(collfreq, float):
+        elif isinstance(collfreq, (float, int, complex)):
             self._collfreq = lambda x: collfreq
         else:
             self._collfreq = collfreq
@@ -101,7 +101,7 @@ class Mermin(AbstractDielectric):
     def collfreq(self, collisions):
         if collisions is None:
             self._collfreq = lambda x: 0
-        elif isinstance(collisions, float):
+        elif isinstance(collisions, (float, int, complex)):
             self._collfreq = lambda x: collisions
         else:
             self._collfreq = collisions

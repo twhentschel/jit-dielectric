@@ -1,4 +1,4 @@
-from uegdielectric.dielectric.dielectric_class import Mermin
+from uegdielectric.dielectric.dielectric_class import Mermin, RPA
 from uegdielectric.electrongas import ElectronGas
 import pytest
 from typing import Callable
@@ -70,3 +70,19 @@ def test_collfreq_setter(
         assert m.collfreq(42) == pytest.approx(collfreq_new)
     else:
         assert m.collfreq == collfreq_new
+
+
+class TestRPA:
+    """Tests for the initialization and use of the RPA model."""
+
+    elecgas = ElectronGas(1.618, 3.141)
+
+    def test_rpa_collfreq(self):
+        r = RPA(self.elecgas)
+        assert r.collfreq(42.0) == pytest.approx(0)
+
+    def test_rpa_collfreq_assign(self):
+        r = RPA(self.elecgas)
+        smallconstfreq = 1 / 27.2114
+        r.collfreq = smallconstfreq
+        assert r.collfreq(3.141) == pytest.approx(smallconstfreq)

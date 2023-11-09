@@ -1,8 +1,10 @@
 """Classes to compute the dielectric function of an electron gas"""
-
 from abc import ABC, abstractmethod
-
+from typing import Callable
+from numbers import Number
+from numpy.typing import ArrayLike
 from uegdielectric.dielectric._Mermin_integrals import MerminDielectric
+from uegdielectric.electrongas import ElectronGas
 
 
 class AbstractDielectric(ABC):
@@ -10,7 +12,7 @@ class AbstractDielectric(ABC):
     function."""
 
     @abstractmethod
-    def __call__(self, q, omega):
+    def __call__(self, q: ArrayLike, omega: ArrayLike) -> ArrayLike:
         """Compute the dielectric function"""
         pass
 
@@ -30,11 +32,15 @@ class Mermin(AbstractDielectric):
         of type float and be defined for all nonegative numbers.
     """
 
-    def __init__(self, electrongas, collfreq=None):
+    def __init__(
+        self,
+        electrongas: ElectronGas,
+        collfreq: Number | Callable[[int | float], Number] | None = None,
+    ) -> None:
         self._electrongas = electrongas
         if collfreq is None:
-            self._collfreq = lambda x: 0
-        elif isinstance(collfreq, float):
+            self._collfreq = lambda x: 0.0
+        elif isinstance(collfreq, Number):
             self._collfreq = lambda x: collfreq
         else:
             self._collfreq = collfreq
@@ -91,17 +97,19 @@ class Mermin(AbstractDielectric):
         return ret
 
     @property
-    def collfreq(self):
+    def collfreq(self) -> Callable[[int | float], Number]:
         """
         The electron-ion collision frequency of the system, in atomic units.
         """
         return self._collfreq
 
     @collfreq.setter
-    def collfreq(self, collisions):
+    def collfreq(
+        self, collisions: Number | Callable[[int | float], Number] | None = None
+    ) -> None:
         if collisions is None:
             self._collfreq = lambda x: 0
-        elif isinstance(collisions, float):
+        elif isinstance(collisions, Number):
             self._collfreq = lambda x: collisions
         else:
             self._collfreq = collisions
@@ -127,7 +135,12 @@ class RPA(Mermin):
      0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV. The following
      example shows how this can be done.
 
-     >>> RPA.collfreq(1/27.2114)
+     >>> dielectric = RPA(electrons)     # electrons is an ElectronGas instance
+     >>> dielectric.collfreq(3.14)       # returns 0.
+     >>> dielectric.collfreq = 1/27.2114
+     >>> dielectric.collfreq(3.14)       # returns 1/27.2114
+
+     `dielectric.collfreq` is now the constant function returns 1/27.2114.
     """
 
     def __init__(self, argument):

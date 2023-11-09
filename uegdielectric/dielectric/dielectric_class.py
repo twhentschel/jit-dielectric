@@ -135,7 +135,12 @@ class RPA(Mermin):
      0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV. The following
      example shows how this can be done.
 
-     >>> RPA.collfreq(1/27.2114)
+     >>> dielectric = RPA(electrons)     # electrons is an ElectronGas instance
+     >>> dielectric.collfreq(3.14)       # returns 0.
+     >>> dielectric.collfreq = 1/27.2114
+     >>> dielectric.collfreq(3.14)       # returns 1/27.2114
+
+     `dielectric.collfreq` is now the constant function returns 1/27.2114.
     """
 
     def __init__(self, argument):

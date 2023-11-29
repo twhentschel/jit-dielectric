@@ -5,7 +5,7 @@ lint = ["flake8>=6.0.0", "black>=23.3.0"]
 
 [project]
 name = "ueg-dielectric"
-version = "0.1.0"
+version = "0.2.0"
 description = "A Python project to compute the dielectric function of an electron gas"
 authors = [
     { name = "Thomas Hentschel", email = "49924808+twhentschel@users.noreply.github.com" },

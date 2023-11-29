@@ -1,28 +1,19 @@
 [tool.pdm]
 [tool.pdm.dev-dependencies]
-test = [
-    "pytest>=7.3.1",
-]
-lint = [
-    "flake8>=6.0.0",
-    "black>=23.3.0",
-]
+test = ["pytest>=7.3.1"]
+lint = ["flake8>=6.0.0", "black>=23.3.0"]
 
 [project]
 name = "ueg-dielectric"
 version = "0.1.0"
 description = "A Python project to compute the dielectric function of an electron gas"
 authors = [
-    {name = "Thomas Hentschel", email = "49924808+twhentschel@users.noreply.github.com"},
+    { name = "Thomas Hentschel", email = "49924808+twhentschel@users.noreply.github.com" },
 ]
-dependencies = [
-    "numpy>=1.24.2",
-    "ipykernel>=6.22.0",
-    "matplotlib>=3.7.1",
-]
-requires-python = ">=3.9"
+dependencies = ["numpy>=1.24.2", "ipykernel>=6.22.0", "matplotlib>=3.7.1"]
+requires-python = ">=3.11"
 readme = "README.md"
-license = {text = "MIT"}
+license = { text = "MIT" }
 
 [build-system]
 requires = ["pdm-backend"]

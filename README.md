@@ -44,7 +44,7 @@ eps(q, omega)
 More examples are being added to the `docs/notebooks` directory.
 
 # Requirements
-UEG dielectric supports Python ≥ 3.9.
+UEG dielectric supports Python ≥ 3.11.
 
 # Installation
 Install the latest GitHub `main` version using `pip`:

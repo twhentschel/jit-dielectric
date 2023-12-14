@@ -1,6 +1,9 @@
 """Classes to compute the dielectric function of an electron gas"""
 from abc import ABC, abstractmethod
 from dataclasses import dataclass
+
+import numpy as np
+
 from typing import Callable
 from numbers import Number
 from numpy.typing import ArrayLike
@@ -90,7 +93,8 @@ class Mermin(AbstractDielectric):
         """
         # Default `collisionrate` is a function that returns 0.
         if collisionrate is None:
-            collisionrate = lambda x: 0.0
+            # Use `numpy.full_like` to keep shape on input if it's an array
+            collisionrate = lambda x: np.full_like(x, 0)
 
         ret = MerminDielectric(
             wavenum,

@@ -376,7 +376,7 @@ def generalMermin(epsilon, k, omega, nu, *args):
     """
 
     omega = np.asarray(omega)
-    N = omega.size
+    N = omega.shape
 
     epsnonzerofreq = epsilon(k, omega, nu, *args)
     epszerofreq = epsilon(k, np.zeros(N), np.zeros(N), *args)

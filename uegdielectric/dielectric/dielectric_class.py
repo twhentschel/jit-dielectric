@@ -112,16 +112,16 @@ class RPA(Mermin):
     """Class for the RPA dielectric model.
 
     The RPA model is equivalent to the Mermin dielectric model with
-    collfreq = 0.
+    `collisionrate` = 0.
 
     Parameters:
     ___________
-    argument : |ElectronGas|
-        |ElectronGas| instance.
+    argument : `ElectronGas`
+        `ElectronGas` instance.
 
     Notes:
     ______
-     In the collective limit (for example, for small wavenumbers), it can be helpful to
+     In the collective limit (for example, for small wave numbers), it can be helpful to
      dampen the RPA response with a small collision rate to avoid numerical
      issues. How small is up to you (the larger the value, the less RPA-like the
      calculation), but a good first attempt is

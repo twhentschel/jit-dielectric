@@ -1,8 +1,15 @@
 """Classes to compute the dielectric function of an electron gas"""
-
 from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+import numpy as np
+
+from typing import Callable
+from numbers import Number
+from numpy.typing import ArrayLike
 
 from uegdielectric.dielectric._Mermin_integrals import MerminDielectric
+from uegdielectric.electrongas import ElectronGas
 
 
 class AbstractDielectric(ABC):
@@ -10,40 +17,42 @@ class AbstractDielectric(ABC):
     function."""
 
     @abstractmethod
-    def __call__(self, q, omega):
-        """Compute the dielectric function"""
+    def __call__(
+        self, wavenum: ArrayLike, frequency: ArrayLike, modifier: Callable = None
+    ) -> ArrayLike:
+        """Compute the dielectric function.
+
+        This is a function of the wave number `wavenum` and the frequency `frequency`
+        of an external perturbation to the electron density. `modifier` is a function
+        that can be used to include wave number or frequency parameters within the
+        dielectric function.
+        """
         pass
 
 
+@dataclass
 class Mermin(AbstractDielectric):
     """
     A class for the Mermin dielecric model.
 
     Parameters:
     ___________
-    electrongas : |ElectronGas|
-        |ElectronGas| instance.
-    collfreq : float or function, optional
-        Electron-ion collision frequency, which depends on the material we
-        are modelling as an electron gas. Can be a function of the frequency
-        of the pertubation. If it is a function, it must have only one argument that is
-        of type float and be defined for all nonegative numbers.
+    electronparams : `ElectronGas`
+        `ElectronGas` instance.
     """
 
-    def __init__(self, electrongas, collfreq=None):
-        self._electrongas = electrongas
-        if collfreq is None:
-            self._collfreq = lambda x: 0
-        elif isinstance(collfreq, float):
-            self._collfreq = lambda x: collfreq
-        else:
-            self._collfreq = collfreq
+    electronparams: ElectronGas
 
-    def __call__(self, q, omega):
+    def __call__(
+        self,
+        wavenum: ArrayLike,
+        frequency: ArrayLike,
+        collisionrate: Callable[[int | float], Number] = None,
+    ) -> ArrayLike:
         """
         The dielectric function of the electron gas as a function of the wave
-        number (q) and frequency (omega) modes excited by a perturbation
-        If the electron-ion collision frequency (collfreq) is not supplied, this
+        number (`wavenum`) and frequency (`frequency`) modes excited by a perturbation
+        If the electron-ion collision rate (`collisionrate`) is not supplied, this
         returns the random phase approximation (RPA) dielectric function. If a
         collision frequency is used, this returns the Mermin dielectric
         function.
@@ -61,77 +70,60 @@ class Mermin(AbstractDielectric):
 
         Parameters:
         ___________
-        q: array_like of real values
-            The spatial frequency of the perturbation acting on the electron
+        wavenum: array_like of real values
+            The wave number of the perturbation acting on the electron
             gas. Units are a.u. or units of 1/a0, where
             a0 = Bohr radius = 0.529 Angstrom.
-        omega: array_like of real values
+        frequency: array_like of real values
             Temporal frequency of the perturbation acting on the electron
-            gas. Units are a.u. or units of Ha, where
-            Ha = Hartree energy = 27.2114 eV.
+            gas. Units are a.u. or units of Ha, where Ha = Hartree energy = 27.2114 eV.
+        collisionrate : Callable, optional
+            Electron-ion collision rate, which depends on the material we
+            are modelling as an electron gas. Assumed to be function of the frequency
+            of the pertubation.
 
         Returns:
         ________
         ret: ndarray of complex values
-            If q and omega are both 1D arrays, shape will be
-            (size(q), size(omega)). Otherwise, if only one of these arguments is
-            a 1D array of size n and the other is a scalar, the shape is
+            If `wavenum` and `frequency` are both 1D arrays, shape will be
+            (size(wavenum), size(frequency)). Otherwise, if only one of these arguments
+            is a 1D array of size n and the other is a scalar, the shape is
             (size(n),). If both arguments are scalars, the result is a complex
             scalar as well.
         """
+        # Default `collisionrate` is a function that returns 0.
+        if collisionrate is None:
+            # Use `numpy.full_like` to keep shape on input if it's an array
+            collisionrate = lambda x: np.full_like(x, 0)
+
         ret = MerminDielectric(
-            q,
-            omega,
-            self._collfreq(omega),
-            self._electrongas.temperature,
-            self._electrongas.chempot,
-            self._electrongas.dosratio,
+            wavenum,
+            frequency,
+            collisionrate(frequency),
+            self.electronparams.temperature,
+            self.electronparams.chemicalpot,
+            self.electronparams.DOSratio,
         )
 
         return ret
-
-    @property
-    def collfreq(self):
-        """
-        The electron-ion collision frequency of the system, in atomic units.
-        """
-        return self._collfreq
-
-    @collfreq.setter
-    def collfreq(self, collisions):
-        if collisions is None:
-            self._collfreq = lambda x: 0
-        elif isinstance(collisions, float):
-            self._collfreq = lambda x: collisions
-        else:
-            self._collfreq = collisions
 
 
 class RPA(Mermin):
     """Class for the RPA dielectric model.
 
     The RPA model is equivalent to the Mermin dielectric model with
-    collfreq = 0.
+    `collisionrate` = 0.
 
     Parameters:
     ___________
-    argument : |ElectronGas|
-        |ElectronGas| instance.
+    argument : `ElectronGas`
+        `ElectronGas` instance.
 
     Notes:
     ______
-     In the collective limit (for example, for small wavenumbers), it can be helpful to
-     dampen the RPA response with a small collision frequency to avoid numerical
+     In the collective limit (for example, for small wave numbers), it can be helpful to
+     dampen the RPA response with a small collision rate to avoid numerical
      issues. How small is up to you (the larger the value, the less RPA-like the
      calculation), but a good first attempt is
-     0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV. The following
-     example shows how this can be done.
-
-     >>> RPA.collfreq(1/27.2114)
+     0.03675 ~ 1/27.2114 = 1/Ha, where Ha = Hartree energy = 27.2114 eV.
     """
-
-    def __init__(self, argument):
-        super().__init__(argument)
-
-    def __call__(self, q, omega):
-        return super().__call__(q, omega)

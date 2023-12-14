@@ -1,10 +1,13 @@
 """ A class to represent the electron gas."""
 
 import warnings
+from dataclasses import dataclass
+from typing import Callable
 
 from uegdielectric.electrongas._inv_fermi_integral import inv_fdint_onehalf as ifdint
 
 
+@dataclass
 class ElectronGas:
     """
     A class for an electron gas.
@@ -37,49 +40,19 @@ class ElectronGas:
     argument and the chemical potential that is computed from the density.
     """
 
-    def __init__(self, temperature, density, DOSratio=None, chemicalpot=None):
-        self._temp = temperature
-        self._density = density
-        self._dosratio = DOSratio
+    temperature: float
+    density: float
+    DOSratio: Callable = None
+    chemicalpot: float = None
 
-        if chemicalpot is None:
-            if self._dosratio is not None:
+    def __post_init__(self):
+        """Compute the chemical potential if not provided."""
+        if self.chemicalpot is None:
+            if self.DOSratio is not None:
                 warnmssg = (
-                    "DOSratio is given but not chemicalpot. Will use the "
-                    + "chemical potential computed using the ideal DOS."
+                    "`DOSratio` is given but not `chemicalpot`. Will use the "
+                    + "chemical potential computed using the ideal Density of States."
                 )
-                warnings.warn(warnmssg)
+                warnings.warn(warnmssg, category=RuntimeWarning)
             # compute chemical potential using ideal DOS
-            self._chempot = ifdint(self._density, self._temp)
-        else:
-            self._chempot = chemicalpot
-
-    @property
-    def temperature(self):
-        """
-        The temperature (thermal energy) of the electron gas, in atomic units.
-        """
-        return self._temp
-
-    @property
-    def density(self):
-        """
-        The density of the electron gas, in atomic units.
-        """
-        return self._density
-
-    @property
-    def chempot(self):
-        """
-        The chemical potential of the electron gas, in atomic units.
-        """
-        return self._chempot
-
-    @property
-    def dosratio(self):
-        """
-        Ratio of the nonideal density of states (DOS) and the ideal DOS.
-        This is a function of the electronic momentum. In atomic units,
-        this is related to the energy by momentum = sqrt(2*energy).
-        """
-        return self._dosratio
+            self.chemicalpot = ifdint(self.density, self.temperature)

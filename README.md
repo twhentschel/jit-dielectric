@@ -26,7 +26,7 @@ d = 2.68e-02 # atomic units - approximately 1.53e16 electrons per centimeters cu
 electrons = ElectronGas(t, d)
 ```
 
-We can use either the `RPA` or `Mermin` classes to compute the complex dielectric function as a function of wave number `q` and frequency `omega`. For the `Mermin` model, we also need to provide an electron-ion collision rate `nu`, which can be frequency dependent.
+We can use either the `RPA` or `Mermin` classes to compute the complex dielectric function as a function of wave number `wavenum` and frequency `frequency`. For the `Mermin` model, we can also provide an electron-ion collision rate `collisionrate`, which is assumed to be frequency dependent.
 
 ```python
 from uegdielectric import dielectric
@@ -36,13 +36,13 @@ q = 1.0 # atomic units
 # frequency
 omega = 0.5 # atomic units
 # dielectric object is callable!
-eps(q, omega)
+eps(wavenum=q, frequency=omega)
 >>> (1.452804827343392+0.8463619935408268j)
 ```
 More examples are being added to the `docs/notebooks` directory.
 
 # Requirements
-UEG dielectric supports Python ≥ 3.9.
+UEG dielectric supports Python ≥ 3.11.
 
 # Installation
 Install the latest GitHub `main` version using `pip`:
